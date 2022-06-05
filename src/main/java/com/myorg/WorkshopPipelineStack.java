@@ -1,12 +1,14 @@
 package com.myorg;
 
 import java.util.List;
+import java.util.Map;
 
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.pipelines.CodeBuildStep;
 import software.amazon.awscdk.pipelines.CodePipeline;
 import software.amazon.awscdk.pipelines.CodePipelineSource;
+import software.amazon.awscdk.pipelines.StageDeployment;
 import software.amazon.awscdk.services.codecommit.Repository;
 import software.constructs.Construct;
 
@@ -28,14 +30,32 @@ public class WorkshopPipelineStack extends Stack {
                 .synth(CodeBuildStep.Builder.create("SynthStep")
                         .input(CodePipelineSource.codeCommit(repo, "master"))
                         .installCommands(List.of(
-                                "npm install -g aws-cdk")) //Cmds to run before build
+                                "npm install -g aws-cdk")) // Cmds to run before build
                         .commands(List.of(
-                                "mvn package",             //java maven build (language specific)
-                                "npx cdk synth"))          //Synth cmd
+                                "mvn package", // java maven build (language specific)
+                                "npx cdk synth")) // Synth cmd
                         .build())
                 .build();
 
         WorkshopPipelineStage deploy = new WorkshopPipelineStage(this, "Deploy");
-        pipeline.addStage(deploy);
+        StageDeployment stageDeployment = pipeline.addStage(deploy);
+
+        stageDeployment.addPost(
+                CodeBuildStep.Builder.create("TestViewerEndpoint")
+                        .projectName("TestViewerEndpoint")
+                        .commands(List.of("curl -Ssf $ENDPOINT_URL"))
+                        .envFromCfnOutputs(Map.of("ENDPOINT_URL", deploy.hcViewerUrl))
+                        .build(),
+
+                CodeBuildStep.Builder.create("TestAPIGatewayEndpoint")
+                        .projectName("TestAPIGatewayEndpoint")
+                        .commands(List.of(
+                                "curl -Ssf $ENDPOINT_URL",
+                                "curl -Ssf $ENDPOINT_URL/hello",
+                                "curl -Ssf $ENDPOINT_URL/test"))
+                        .envFromCfnOutputs(Map.of("ENDPOINT_URL", deploy.hcEndpoint))
+                        .build()
+
+        );
     }
 }

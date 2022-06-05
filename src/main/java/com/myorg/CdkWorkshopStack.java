@@ -15,6 +15,9 @@ import software.amazon.awscdk.services.sqs.Queue;
 import software.constructs.Construct;
 
 public class CdkWorkshopStack extends Stack {
+        public final CfnOutput hcViewerUrl;
+        public final CfnOutput hcEndpoint;
+
         public CdkWorkshopStack(final Construct parent, final String id) {
                 this(parent, id, null);
         }
@@ -43,16 +46,16 @@ public class CdkWorkshopStack extends Stack {
                 // Defines a viewer for the HitCounter table - used for dev only!
                 // Using Construct library
                 final TableViewer tv = TableViewer.Builder.create(this, "ViewerHitCounter")
-                                .title("Hello this")
+                                .title("Hello Hits")
                                 .table(helloWithCounter.getTable())
                                 .sortBy("-hits")
                                 .build();
 
-                final CfnOutput hcViewerUrl = CfnOutput.Builder.create(this, "TableViwerUrl")
+                hcViewerUrl = CfnOutput.Builder.create(this, "TableViwerUrl")
                                 .value(tv.getEndpoint())
                                 .build();
 
-                final CfnOutput hcEndpoint = CfnOutput.Builder.create(this, "TableViwerUrl")
+                hcEndpoint = CfnOutput.Builder.create(this, "GatewayUrl")
                                 .value(gateway.getUrl())
                                 .build();
         }
