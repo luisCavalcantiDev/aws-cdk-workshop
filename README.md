@@ -1,3 +1,5 @@
+
+# Test project for AWS CDK using CDK [Java Workshop](https://cdkworkshop.com/50-java.html) with some other change and tests
 # Welcome to your CDK Java project!
 
 You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`CdkWorkshopStack`)
@@ -20,3 +22,12 @@ It is a [Maven](https://maven.apache.org/) based project, so you can open this p
 
 Enjoy!
 
+# links
+[Getting Stated](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
+[Examples](https://github.com/aws-samples/aws-cdk-examples)
+[Best Practices](https://docs.aws.amazon.com/cdk/v2/guide/best-practices.html)
+[Continuous integration and delivery (CI/CD) using CDK Pipelines](https://docs.aws.amazon.com/cdk/v2/guide/cdk_pipeline.html)
+[cdk-dynamo-table-viewer](https://github.com/cdklabs/cdk-dynamo-table-viewer)
+[API Reference](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-construct-library.html)
+[security-impacting](https://github.com/aws/aws-cdk/issues/1299)
+[Increasing development speed with CDK Watch](https://aws.amazon.com/blogs/developer/increasing-development-speed-with-cdk-watch/)
