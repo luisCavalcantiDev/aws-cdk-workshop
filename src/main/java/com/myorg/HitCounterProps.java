@@ -1,6 +1,5 @@
 package com.myorg;
 
-import software.amazon.awscdk.services.cloudfront.IFunction;
 import software.amazon.awscdk.services.lambda.Function;
 
 public interface HitCounterProps {
@@ -23,12 +22,7 @@ public interface HitCounterProps {
                 throw new IllegalArgumentException("The downstream property is required!");
             }
             
-            return new HitCounterProps() {
-                @Override
-                public Function getDownstream() {
-                    return downstream;
-                }
-            };
+            return () -> downstream;
         }
     }
 }
