@@ -1,6 +1,7 @@
 package com.myorg;
 
 import io.github.cdklabs.dynamotableviewer.TableViewer;
+import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
@@ -14,50 +15,58 @@ import software.amazon.awscdk.services.sqs.Queue;
 import software.constructs.Construct;
 
 public class CdkWorkshopStack extends Stack {
-    public CdkWorkshopStack(final Construct parent, final String id) {
-        this(parent, id, null);
-    }
+        public CdkWorkshopStack(final Construct parent, final String id) {
+                this(parent, id, null);
+        }
 
-    public CdkWorkshopStack(final Construct parent, final String id, final StackProps props) {
-        super(parent, id, props);
+        public CdkWorkshopStack(final Construct parent, final String id, final StackProps props) {
+                super(parent, id, props);
 
-        // buildQueues();
+                // buildQueues();
 
-        // Defines Lambda function resource
-        final Function hello = Function.Builder.create(this, "HelloHandler")
-                .runtime(Runtime.NODEJS_14_X)
-                .code(Code.fromAsset("lambda"))
-                .handler("hello.handler")
-                .build();
+                // Defines Lambda function resource
+                final Function hello = Function.Builder.create(this, "HelloHandler")
+                                .runtime(Runtime.NODEJS_14_X)
+                                .code(Code.fromAsset("lambda"))
+                                .handler("hello.handler")
+                                .build();
 
-        final HitCounter helloWithCounter = new HitCounter(this, "HelloHitCounter", HitCounterProps.builder()
-                .downstream(hello)
-                .build());
+                final HitCounter helloWithCounter = new HitCounter(this, "HelloHitCounter", HitCounterProps.builder()
+                                .downstream(hello)
+                                .build());
 
-        // Defines an API Gateway REST API resource based by "hello" lambda function
-        LambdaRestApi.Builder.create(this, "Endpoint")
-                .handler(helloWithCounter.getHandler())
-                .build();
+                // Defines an API Gateway REST API resource based by "hello" lambda function
+                final LambdaRestApi gateway = LambdaRestApi.Builder.create(this, "Endpoint")
+                                .handler(helloWithCounter.getHandler())
+                                .build();
 
-        // Defines a viewer for the HitCounter table - used for dev only!
-        // Using Construct library
-        TableViewer.Builder.create(this, "ViewerHitCounter")
-                .title("Hello this")
-                .table(helloWithCounter.getTable())
-                .sortBy("-hits")
-                .build();
-    }
+                // Defines a viewer for the HitCounter table - used for dev only!
+                // Using Construct library
+                final TableViewer tv = TableViewer.Builder.create(this, "ViewerHitCounter")
+                                .title("Hello this")
+                                .table(helloWithCounter.getTable())
+                                .sortBy("-hits")
+                                .build();
 
-    // Defines SQS queue and SNS queue resources and add to SNS queue subscriptions.
-    private void buildQueues() {
-        final Queue queue = Queue.Builder.create(this, "CdkWorkshopQueue")
-                .visibilityTimeout(Duration.seconds(300))
-                .build();
+                final CfnOutput hcViewerUrl = CfnOutput.Builder.create(this, "TableViwerUrl")
+                                .value(tv.getEndpoint())
+                                .build();
 
-        final Topic topic = Topic.Builder.create(this, "CdkWorkshopTopic")
-                .displayName("My First Topic Yeah")
-                .build();
+                final CfnOutput hcEndpoint = CfnOutput.Builder.create(this, "TableViwerUrl")
+                                .value(gateway.getUrl())
+                                .build();
+        }
 
-        topic.addSubscription(new SqsSubscription(queue));
-    }
+        // Defines SQS queue and SNS queue resources and add to SNS queue subscriptions.
+        private void buildQueues() {
+                final Queue queue = Queue.Builder.create(this, "CdkWorkshopQueue")
+                                .visibilityTimeout(Duration.seconds(300))
+                                .build();
+
+                final Topic topic = Topic.Builder.create(this, "CdkWorkshopTopic")
+                                .displayName("My First Topic Yeah")
+                                .build();
+
+                topic.addSubscription(new SqsSubscription(queue));
+        }
 }
