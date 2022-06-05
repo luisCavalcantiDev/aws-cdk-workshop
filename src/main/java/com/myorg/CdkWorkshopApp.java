@@ -10,10 +10,17 @@ public final class CdkWorkshopApp {
         
         Environment envDev = makeEnv(Config.ACCOUNT_ID, Config.REGION_ID);
 
-        new CdkWorkshopStack(app, "CdkWorkshopStack", 
+        //Using CDK Pipelines
+        new WorkshopPipelineStack(app, "WorkshopPipelineStack", 
             StackProps.builder()
                 .env(envDev)
                 .build());
+
+        //Testing create stacks with CDK
+        // new CdkWorkshopStack(app, "CdkWorkshopStack", 
+        //     StackProps.builder()
+        //         .env(envDev)
+        //         .build());
 
         app.synth();
     }
