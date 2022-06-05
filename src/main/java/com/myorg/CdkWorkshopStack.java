@@ -28,10 +28,14 @@ public class CdkWorkshopStack extends Stack {
                 .code(Code.fromAsset("lambda"))
                 .handler("hello.handler")
                 .build();
-                
+
+        final HitCounter helloWithCounter = new HitCounter(this, "HelloHitCounter", HitCounterProps.builder()
+            .downstream(hello)
+            .build());
+        
         //Defines an API Gateway REST API resource based by "hello" lambda function 
         LambdaRestApi.Builder.create(this, "Endpoint")
-                .handler(hello)
+                .handler(helloWithCounter.getHandler())
                 .build();
     }
 

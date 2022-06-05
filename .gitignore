@@ -11,3 +11,4 @@ target
 .cdk.staging
 cdk.out
 
+src/main/java/com/myorg/Config.java
