@@ -19,20 +19,23 @@ public class WorkshopPipelineStack extends Stack {
         super(parent, id, props);
 
         // Defines CodeCommit repository resource
-        Repository repo = Repository.Builder.create(this, "WorkshopRepo")
+        final Repository repo = Repository.Builder.create(this, "WorkshopRepo")
                 .repositoryName("WorkshopRepo")
                 .build();
 
-        CodePipeline.Builder.create(this, "Pipeline")
+        CodePipeline pipeline = CodePipeline.Builder.create(this, "Pipeline")
                 .pipelineName("WorkshopPipeline")
                 .synth(CodeBuildStep.Builder.create("SynthStep")
                         .input(CodePipelineSource.codeCommit(repo, "master"))
                         .installCommands(List.of(
-                                "npm install -g aws-cdk"))
+                                "npm install -g aws-cdk")) //Cmds to run before build
                         .commands(List.of(
-                                "mvn package",
-                                "npx cdk synth"))
+                                "mvn package",             //java maven build (language specific)
+                                "npx cdk synth"))          //Synth cmd
                         .build())
                 .build();
+
+        WorkshopPipelineStage deploy = new WorkshopPipelineStage(this, "Deploy");
+        pipeline.addStage(deploy);
     }
 }
