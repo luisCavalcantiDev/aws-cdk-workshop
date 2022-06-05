@@ -1,6 +1,6 @@
-
-# Test project for AWS CDK using CDK [Java Workshop](https://cdkworkshop.com/50-java.html) with some other change and tests
 # Welcome to your CDK Java project!
+
+Test project for AWS CDK using CDK [Java Workshop](https://cdkworkshop.com/50-java.html) with some other changes and tests using AWS CodeCommit and AWS CodePipeline.
 
 You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`CdkWorkshopStack`)
 which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
