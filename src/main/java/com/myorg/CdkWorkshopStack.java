@@ -1,5 +1,6 @@
 package com.myorg;
 
+import io.github.cdklabs.dynamotableviewer.TableViewer;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
@@ -22,7 +23,7 @@ public class CdkWorkshopStack extends Stack {
 
         // buildQueues();
 
-        //Defines Lambda function resource
+        // Defines Lambda function resource
         final Function hello = Function.Builder.create(this, "HelloHandler")
                 .runtime(Runtime.NODEJS_14_X)
                 .code(Code.fromAsset("lambda"))
@@ -30,16 +31,24 @@ public class CdkWorkshopStack extends Stack {
                 .build();
 
         final HitCounter helloWithCounter = new HitCounter(this, "HelloHitCounter", HitCounterProps.builder()
-            .downstream(hello)
-            .build());
-        
-        //Defines an API Gateway REST API resource based by "hello" lambda function 
+                .downstream(hello)
+                .build());
+
+        // Defines an API Gateway REST API resource based by "hello" lambda function
         LambdaRestApi.Builder.create(this, "Endpoint")
                 .handler(helloWithCounter.getHandler())
                 .build();
+
+        // Defines a viewer for the HitCounter table - used for dev only!
+        // Using Construct library
+        TableViewer.Builder.create(this, "ViewerHitCounter")
+                .title("Hello this")
+                .table(helloWithCounter.getTable())
+                .sortBy("-hits")
+                .build();
     }
 
-    //Defines SQS queue and SNS queue resources and add to SNS queue subscriptions.
+    // Defines SQS queue and SNS queue resources and add to SNS queue subscriptions.
     private void buildQueues() {
         final Queue queue = Queue.Builder.create(this, "CdkWorkshopQueue")
                 .visibilityTimeout(Duration.seconds(300))
